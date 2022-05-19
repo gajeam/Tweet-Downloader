@@ -301,7 +301,7 @@ def main():
     # If the CSV is empty or doesn't exist, create one
     if (os.path.exists(fileURL) == False) or (os.stat(fileURL).st_size == 0):
         # Read in the headers from the template
-        csvTemplate=open(DATA_DIRECTORY + "Mentions_Template.csv", "r").readline()
+        csvTemplate=open(DATA_DIRECTORY + "template/Mentions_Template.csv", "r").readline()
         csvF_URL=open(fileURL,"a+", newline="", encoding='utf-8')
         urlWriter = csv.writer(csvF_URL)
         urlWriter.writerow(['Candidate', 'Conversation_URL'])
