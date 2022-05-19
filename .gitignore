@@ -1,3 +1,4 @@
 # ignore CSV and JSON and data files 
 /data/*.csv
 /data/*.json
+bearer_token.txt

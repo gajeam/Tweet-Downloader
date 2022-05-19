@@ -1,6 +1,6 @@
-### LIBRARIES
-#Download tweets 
-#First look for lines saying: os.environ['TOKEN'] = '' and write you bearer token
+#################
+### LIBRARIES ###
+#################
 # For sending GET requests from the API
 import requests
 # For saving access tokens and for file management when creating and adding to the dataset
@@ -19,12 +19,19 @@ import unicodedata
 import time
 import ast
 
-### CONSTANTS
+
+#################
+### CONSTANTS ###
+#################
+
 DATA_DIRECTORY = "data/"
+BEARER_TOKEN_PATH = "bearer_token.txt"
 
 
-###################### Replace your bearer token below within the quotes and in line 288
-os.environ['TOKEN'] = 'REPLACEYOUR bearer_token HERE' 
+#################
+### FUNCTIONS ###
+#################
+
 def auth():
     return os.getenv('TOKEN')
 
@@ -290,7 +297,8 @@ def append_to_csv(json_response, fileName, username):
 
 def main():
     #Inputs for tweets
-    os.environ['TOKEN'] = 'REPLACEYOUR bearer_token HERE' 
+
+    os.environ['TOKEN'] = open(BEARER_TOKEN_PATH, "r").readline()
     
     ##############
     ##############
