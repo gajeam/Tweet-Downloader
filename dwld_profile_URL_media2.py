@@ -352,6 +352,39 @@ def main():
                         '2020-11-08T11:52:00.000Z',
                         '2020-11-09T23:32:00.000Z',
                         '2020-11-20T22:04:00.000Z']
+
+
+'''
+NOTE FROM GABE:
+This used to be two files, one for a two second delay (this one) and one for a five second delay.
+It seemed stupid to have multiple code bases for almost the exact same thing, so I am just copying
+and pasting the different code from that one into this one. 
+
+There were only two differences I could find: this end_list time, which here is 20 minutes and in
+the other is 1 minute. Not exactly sure how we came up with those numbers, or how the end of the file
+names ended up being '2' (this one) and '5' the other one, but hey, life is full of mysteries.
+And I'll rewrite this to be cleaner in the next version
+
+        end_list =      ['2020-10-04T15:22:00.000Z',
+                        '2020-10-11T22:51:00.000Z', 
+                        '2020-10-15T14:31:00.000Z', 
+                        '2020-10-16T13:09:00.000Z',
+                        '2020-10-18T22:12:00.000Z',
+                        '2020-11-01T14:36:00.000Z',
+                        '2020-11-05T19:42:00.000Z',
+                        '2020-11-08T11:33:00.000Z',
+                        '2020-11-09T23:13:00.000Z',
+                        '2020-11-20T21:45:00.000Z']
+
+The other difference I found is that it has a different list of candidates. Again, we'll be doing
+this in a cleaner way when the real thing comes along, but here's the code fromteh other file.
+
+    username = ['harrisonjaime']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
+
+Everything else seemed to be the same.
+'''
+
+
         max_results = 99
         
         #Total number of tweets we collected from the loop
