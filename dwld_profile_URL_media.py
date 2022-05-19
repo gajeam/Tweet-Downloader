@@ -1,6 +1,6 @@
-###
-#Download tweets 
-#First look for lines saying: os.environ['TOKEN'] = '' and write you bearer token
+#################
+### LIBRARIES ###
+#################
 # For sending GET requests from the API
 import requests
 # For saving access tokens and for file management when creating and adding to the dataset
@@ -18,8 +18,20 @@ import unicodedata
 #To add wait time between requests
 import time
 import ast
-###################### Replace your bearer token below within the quotes and in line 288
-os.environ['TOKEN'] = 'REPLACEYOUR bearer_token HERE' 
+
+
+#################
+### CONSTANTS ###
+#################
+
+DATA_DIRECTORY = "data/"
+BEARER_TOKEN_PATH = "bearer_token.txt"
+
+
+#################
+### FUNCTIONS ###
+#################
+
 def auth():
     return os.getenv('TOKEN')
 
@@ -285,27 +297,32 @@ def append_to_csv(json_response, fileName, username):
 
 def main():
     #Inputs for tweets
-    os.environ['TOKEN'] = 'REPLACEYOUR bearer_token HERE' 
+
+    os.environ['TOKEN'] = open(BEARER_TOKEN_PATH, "r").readline()
     
     ##############
     ##############
     ############## Variable for candidates' accounts
-    username = ['harrisonjaime']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
+    username = ['JoshHarder','realannapaulina']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
     
-    fileURL= 'Mentions_URL.csv'
-    '''csvF_URL=open(fileURL,"a", newline="", encoding='utf-8')
-    urlWriter = csv.writer(csvF_URL)
-    urlWriter.writerow(['Candidate', 'Conversation_URL'])
-    csvF_URL.close()'''
+    fileURL= DATA_DIRECTORY + 'Mentions_URL.csv'
+    # If the CSV is empty or doesn't exist, create one
+    if (os.path.exists(fileURL) == False) or (os.stat(fileURL).st_size == 0):
+        # Read in the headers from the template
+        csvTemplate=open(DATA_DIRECTORY + "template/Mentions_Template.csv", "r").readline()
+        csvF_URL=open(fileURL,"a+", newline="", encoding='utf-8')
+        urlWriter = csv.writer(csvF_URL)
+        urlWriter.writerow(['Candidate', 'Conversation_URL'])
+        csvF_URL.close()
 
     for name in username:
         ######################
         ######################
         ######################Variable for the filter
         keyword = '(from:'+name+' OR @'+name+') -is:retweet' ############This line is the filter
-        file_name= name+'_1profileNRT.csv'
-        file_json= name+'_1profileNRT.json'
-        file2_json= name+'_4app.csv'
+        file_name= DATA_DIRECTORY + name +'_1profileNRT.csv'
+        file_json= DATA_DIRECTORY + name +'_1profileNRT.json'
+        file2_json= DATA_DIRECTORY + name +'_4app.csv'
        
         bearer_token = auth()
         headers = create_headers(bearer_token)
@@ -323,18 +340,50 @@ def main():
                         '2020-11-08T11:32:00.000Z', 
                         '2020-11-09T23:12:00.000Z', 
                         '2020-11-20T21:44:00.000Z']
-                         #'2020-11-01T00:00:00.000Z']
+                         
 
-        end_list =      ['2020-10-04T15:22:00.000Z',
-                        '2020-10-11T22:51:00.000Z', 
-                        '2020-10-15T14:31:00.000Z', 
-                        '2020-10-16T13:09:00.000Z',
-                        '2020-10-18T22:12:00.000Z',
-                        '2020-11-01T14:36:00.000Z',
-                        '2020-11-05T19:42:00.000Z',
-                        '2020-11-08T11:33:00.000Z',
-                        '2020-11-09T23:13:00.000Z',
-                        '2020-11-20T21:45:00.000Z']
+        end_list =      ['2020-10-04T15:41:00.000Z',
+                        '2020-10-11T23:10:00.000Z', 
+                        '2020-10-15T14:50:00.000Z', 
+                        '2020-10-16T13:28:00.000Z',
+                        '2020-10-18T22:31:00.000Z',
+                        '2020-11-01T14:55:00.000Z',
+                        '2020-11-05T20:01:00.000Z',
+                        '2020-11-08T11:52:00.000Z',
+                        '2020-11-09T23:32:00.000Z',
+                        '2020-11-20T22:04:00.000Z']
+
+        ''' 
+        NOTE FROM GABE:
+        This used to be two files, one for a two second delay (this one) and one for a five second delay.
+        It seemed stupid to have multiple code bases for almost the exact same thing, so I am just copying
+        and pasting the different code from that one into this one. 
+
+        There were only two differences I could find: this end_list time, which here is 20 minutes and in
+        the other is 1 minute. Not exactly sure how we came up with those numbers, or how the end of the file
+        names ended up being '2' (this one) and '5' the other one, but hey, life is full of mysteries.
+        And I'll rewrite this to be cleaner in the next version
+
+                end_list =      ['2020-10-04T15:22:00.000Z',
+                                '2020-10-11T22:51:00.000Z', 
+                                '2020-10-15T14:31:00.000Z', 
+                                '2020-10-16T13:09:00.000Z',
+                                '2020-10-18T22:12:00.000Z',
+                                '2020-11-01T14:36:00.000Z',
+                                '2020-11-05T19:42:00.000Z',
+                                '2020-11-08T11:33:00.000Z',
+                                '2020-11-09T23:13:00.000Z',
+                                '2020-11-20T21:45:00.000Z']
+
+        The other difference I found is that it has a different list of candidates. Again, we'll be doing
+        this in a cleaner way when the real thing comes along, but here's the code fromteh other file.
+
+            username = ['harrisonjaime']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
+
+        Everything else seemed to be the same.
+        '''
+        
+        
         max_results = 99
         
         #Total number of tweets we collected from the loop
