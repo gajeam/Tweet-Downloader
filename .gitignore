@@ -1,0 +1,6 @@
+# do not ignore data dir
+!/data
+# ignore files and sub dirs in the /dir directory
+/data/*
+# but do not ignore the template file
+!/data/Mentions_Template.csv

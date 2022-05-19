@@ -1,4 +1,4 @@
-###
+### LIBRARIES
 #Download tweets 
 #First look for lines saying: os.environ['TOKEN'] = '' and write you bearer token
 # For sending GET requests from the API
@@ -18,6 +18,11 @@ import unicodedata
 #To add wait time between requests
 import time
 import ast
+
+### CONSTANTS
+DATA_DIRECTORY = "data/"
+
+
 ###################### Replace your bearer token below within the quotes and in line 288
 os.environ['TOKEN'] = 'REPLACEYOUR bearer_token HERE' 
 def auth():
@@ -292,20 +297,24 @@ def main():
     ############## Variable for candidates' accounts
     username = ['JoshHarder','realannapaulina']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
     
-    fileURL= 'Mentions_URL.csv'
-    '''csvF_URL=open(fileURL,"a", newline="", encoding='utf-8')
-    urlWriter = csv.writer(csvF_URL)
-    urlWriter.writerow(['Candidate', 'Conversation_URL'])
-    csvF_URL.close()'''
+    fileURL= DATA_DIRECTORY + 'Mentions_URL.csv'
+    # If the CSV is empty or doesn't exist, create one
+    if (os.path.exists(fileURL) == False) or (os.stat(fileURL).st_size == 0):
+        # Read in the headers from the template
+        csvTemplate=open(DATA_DIRECTORY + "Mentions_Template.csv", "r").readline()
+        csvF_URL=open(fileURL,"a+", newline="", encoding='utf-8')
+        urlWriter = csv.writer(csvF_URL)
+        urlWriter.writerow(['Candidate', 'Conversation_URL'])
+        csvF_URL.close()
 
     for name in username:
         ######################
         ######################
         ######################Variable for the filter
         keyword = '(from:'+name+' OR @'+name+') -is:retweet' ############This line is the filter
-        file_name= name+'_1profileNRT.csv'
-        file_json= name+'_1profileNRT.json'
-        file2_json= name+'_4app.csv'
+        file_name= DATA_DIRECTORY + name +'_1profileNRT.csv'
+        file_json= DATA_DIRECTORY + name +'_1profileNRT.json'
+        file2_json= DATA_DIRECTORY + name +'_4app.csv'
        
         bearer_token = auth()
         headers = create_headers(bearer_token)
