@@ -91,7 +91,7 @@ def append_csv_url(json_response, fileName, username):
             conversation_id= ''
         
         
-        conversation_url1 = f"https://twitter.com/{user_username[cc]}/status/{conversation_id}"
+        conversation_url1 = f"https://twitter.com/{user_username[min(cc, len(user_username)-1)]}/status/{conversation_id}"
                 # 9. attachments
 
         # Assemble all data in a list
@@ -125,6 +125,7 @@ def append_csv_app(json_response, fileName, username):
 
     #Loop through each tweet
     cc=0
+
     for tweet in json_response['data']:
         
         # We will create a variable for each since some of the keys might not exist for some tweets
@@ -143,9 +144,11 @@ def append_csv_app(json_response, fileName, username):
             conversation_id = tweet['conversation_id']
         else:
             conversation_id= ''
-        
+
         conversation_url = f"https://twitter.com/{username}/status/{conversation_id}"
-        conversation_url1 = f"https://twitter.com/{user_username[cc]}/status/{conversation_id}"
+        # Catch this error, which actually shouldn't matter since the status is always the same
+        conversation_url1 = f"https://twitter.com/{user_username[min(cc, len(user_username)-1)]}/status/{conversation_id}"
+
                 # 9. attachments
         if ('attachments' in tweet): 
             attachments =tweet['attachments']
@@ -278,7 +281,7 @@ def append_to_csv(json_response, fileName, username):
             reply_settings= ''     
 
         
-        conversation_url= f"https://twitter.com/{user_username[cc]}/status/{conversation_id}"
+        conversation_url= f"https://twitter.com/{user_username[min(cc, len(user_username)-1)]}/status/{conversation_id}"
         ################Agregando Users information
    
         
@@ -303,7 +306,15 @@ def main():
     ##############
     ##############
     ############## Variable for candidates' accounts
-    username = ['JoshHarder','realannapaulina']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
+
+    username_list = []
+    with open('initial_counts_duplicate.csv', newline='') as handlesCSV:
+        reader = csv.DictReader(handlesCSV)
+        for row in reader:
+            username_list.append(row)
+
+
+    # username = ['JoshHarder','realannapaulina']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
     
     fileURL= DATA_DIRECTORY + 'Mentions_URL.csv'
     # If the CSV is empty or doesn't exist, create one
@@ -315,7 +326,10 @@ def main():
         urlWriter.writerow(['Candidate', 'Conversation_URL'])
         csvF_URL.close()
 
-    for name in username:
+    for row in username_list:
+        name = row['candidate']
+        tweet_count = int(row['tweet count'])
+
         ######################
         ######################
         ######################Variable for the filter
@@ -330,58 +344,32 @@ def main():
 #####################
 #####################
 #####################Variable for time-windows. start_list and end_list must have the same number of elements
-        start_list =    ['2020-10-04T15:21:00.000Z',
-                        '2020-10-11T22:50:00.000Z',
-                        '2020-10-15T14:30:00.000Z',
-                        '2020-10-16T13:08:00.000Z', 
-                        '2020-10-18T22:11:00.000Z',
-                        '2020-11-01T14:35:00.000Z',
-                        '2020-11-05T19:41:00.000Z',
-                        '2020-11-08T11:32:00.000Z', 
-                        '2020-11-09T23:12:00.000Z', 
-                        '2020-11-20T21:44:00.000Z']
-                         
+        start_time_date=[datetime.datetime(2020, 10, 4, 15, 21, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 10, 11, 22, 50, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 10, 15, 14, 30, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 10, 16, 13, 8, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 10, 18, 22, 11, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 11, 1, 14, 35, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 11, 5, 19, 41, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 11, 8, 11, 32, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 11, 9, 23, 12, 0, 0, datetime.timezone.utc),
+            datetime.datetime(2020, 11, 20, 21, 44, 0, 0, datetime.timezone.utc)]
+        
+        hour_count = 0
+        if tweet_count >= 1000:
+            hour_count = 1
+        elif tweet_count >= 100:
+            hour_count = 4
+        elif tweet_count >= 10:
+            hour_count = 48
+        else:
+            hour_count = 168
 
-        end_list =      ['2020-10-04T15:41:00.000Z',
-                        '2020-10-11T23:10:00.000Z', 
-                        '2020-10-15T14:50:00.000Z', 
-                        '2020-10-16T13:28:00.000Z',
-                        '2020-10-18T22:31:00.000Z',
-                        '2020-11-01T14:55:00.000Z',
-                        '2020-11-05T20:01:00.000Z',
-                        '2020-11-08T11:52:00.000Z',
-                        '2020-11-09T23:32:00.000Z',
-                        '2020-11-20T22:04:00.000Z']
+        hour_count= 16
+        end_time_date = [timestamp + datetime.timedelta(hours = hour_count) for timestamp in start_time_date] 
 
-        ''' 
-        NOTE FROM GABE:
-        This used to be two files, one for a two second delay (this one) and one for a five second delay.
-        It seemed stupid to have multiple code bases for almost the exact same thing, so I am just copying
-        and pasting the different code from that one into this one. 
-
-        There were only two differences I could find: this end_list time, which here is 20 minutes and in
-        the other is 1 minute. Not exactly sure how we came up with those numbers, or how the end of the file
-        names ended up being '2' (this one) and '5' the other one, but hey, life is full of mysteries.
-        And I'll rewrite this to be cleaner in the next version
-
-                end_list =      ['2020-10-04T15:22:00.000Z',
-                                '2020-10-11T22:51:00.000Z', 
-                                '2020-10-15T14:31:00.000Z', 
-                                '2020-10-16T13:09:00.000Z',
-                                '2020-10-18T22:12:00.000Z',
-                                '2020-11-01T14:36:00.000Z',
-                                '2020-11-05T19:42:00.000Z',
-                                '2020-11-08T11:33:00.000Z',
-                                '2020-11-09T23:13:00.000Z',
-                                '2020-11-20T21:45:00.000Z']
-
-        The other difference I found is that it has a different list of candidates. Again, we'll be doing
-        this in a cleaner way when the real thing comes along, but here's the code fromteh other file.
-
-            username = ['harrisonjaime']#, 'hiral4congress','ThomTillis','RepJahanaHayes', 'Meg4Congress','PauletteEJordan']
-
-        Everything else seemed to be the same.
-        '''
+        start_list = [t.strftime('%Y-%m-%dT%H:%M:%S.000Z') for t in start_time_date]
+        end_list = [t.strftime('%Y-%m-%dT%H:%M:%S.000Z') for t in end_time_date]
         
         
         max_results = 99
