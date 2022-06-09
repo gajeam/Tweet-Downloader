@@ -308,7 +308,7 @@ def main():
     ############## Variable for candidates' accounts
 
     username_list = []
-    with open('initial_counts_duplicate.csv', newline='') as handlesCSV:
+    with open('initial_counts.csv', newline='') as handlesCSV:
         reader = csv.DictReader(handlesCSV)
         for row in reader:
             username_list.append(row)
@@ -404,6 +404,7 @@ def main():
     
             # Check if flag is true
             while flag:
+                startRequest = time.time()
             
                 print("-------------------")
                 print("Token: ", next_token)
@@ -431,7 +432,7 @@ def main():
                         total_tweets += result_count
                         print("Total # of Tweets added: ", total_tweets)
                         print("-------------------")
-                        time.sleep(2)   
+
                                     
                 # If no next token exists
                 else:
@@ -449,15 +450,14 @@ def main():
                         total_tweets += result_count
                         print("Total # of Tweets added: ", total_tweets)
                         print("-------------------")
-                        time.sleep(2)
-                        
-            
                     
                     flag = False
                     next_token = None
-                
-                time.sleep(2)
-
+                endRequest = time.time()
+                print(endRequest - startRequest)
+                if (endRequest - startRequest < 3):
+                    time.sleep(3.2 - (endRequest - startRequest))
+                    
         print("Total number of results: ", total_tweets)
 
 
